@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { assert } = require('chai');
 
 const Drawing = artifacts.require('Drawing');
@@ -36,5 +37,23 @@ contract('Drawing', (accounts) => {
         });
 
     })
+
+    describe('svg to token uri', async () => {
+  
+        it('svgToImageURI', async () => {
+            const image = fs.readFileSync('./test/image.svg', { encoding: 'utf-8' });
+            const imageURI = await contract.svgToImageURI(image);
+            assert.isNotNull(imageURI);
+        });
+
+        it('createTokenURI', async() => {
+            const name = 'name';
+            const description = 'description';
+            const image = 'image';
+            const tokenURI = await contract.createTokenURI(name, description, image);
+            assert.equal(tokenURI, 'data:application/json;base64,eyJuYW1lIjogIm5hbWUiLCAiZGVzY3JpcHRpb24iOiAiZGVzY3JpcHRpb24iLCAiYXR0cmlidXRlcyI6ICIiLCAiaW1hZ2UiOiAiaW1hZ2UiIH0=')
+        });
+
+    })  
 
 })
