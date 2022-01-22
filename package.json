@@ -4,8 +4,7 @@
   "description": "",
   "main": "./src/app.js",
   "scripts": {
-    "start": "node ./src/app.js",
-    "test": "nodemon ./src/app.js"
+    "test": "echo 'Not Defined!'"
   },
   "author": "Antonio Cirillo",
   "license": "MIT",
@@ -13,12 +12,6 @@
     "@openzeppelin/contracts": "^4.4.2",
     "base64-sol": "^1.1.0",
     "chai": "^4.3.4",
-    "chai-as-promised": "^7.1.1",
-    "ejs": "^3.1.6",
-    "express": "^4.17.2",
-    "multer": "^1.4.4"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.15"
+    "chai-as-promised": "^7.1.1"
   }
 }
