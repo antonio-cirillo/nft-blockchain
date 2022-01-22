@@ -2,6 +2,7 @@ const fs = require('fs');
 const { assert } = require('chai');
 
 const Drawing = artifacts.require('Drawing');
+const DrawingMarket = artifacts.require('DrawingMarket');
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -11,9 +12,11 @@ contract('Drawing', (accounts) => {
 
     // Declare contract
     let contract;
+    let market;
 
     before(async () => {
         contract = await Drawing.deployed();
+        market = await DrawingMarket.deployed();
     })
 
     describe('deployment', async () => {
@@ -23,7 +26,7 @@ contract('Drawing', (accounts) => {
             assert.notEqual(address, 0x0);
             assert.notEqual(address, '');
             assert.notEqual(address, null);
-            assert.notEqual(address, undefined);            
+            assert.notEqual(address, undefined); 
         });
 
         it("has a name", async () => {
@@ -37,16 +40,16 @@ contract('Drawing', (accounts) => {
         });
 
     })
+    
+    describe('create', async () => {
 
-    describe('svg to token uri', async () => {
-  
         it('svgToImageURI', async () => {
             const image = fs.readFileSync('./test/image.svg', { encoding: 'utf-8' });
             const imageURI = await contract.svgToImageURI(image);
             assert.isNotNull(imageURI);
         });
 
-        it('createTokenURI', async() => {
+        it('createTokenURI', async () => {
             const name = 'name';
             const description = 'description';
             const image = 'image';
@@ -54,6 +57,22 @@ contract('Drawing', (accounts) => {
             assert.equal(tokenURI, 'data:application/json;base64,eyJuYW1lIjogIm5hbWUiLCAiZGVzY3JpcHRpb24iOiAiZGVzY3JpcHRpb24iLCAiYXR0cmlidXRlcyI6ICIiLCAiaW1hZ2UiOiAiaW1hZ2UiIH0=')
         });
 
-    })  
+        it('createToken', async () => {
+            const name = 'name';
+            const description = 'description';
+            const image = 'image';
+            const tokenId = await contract.createToken(name, description, image);
+            assert.isNotNull(tokenId);
+        });
+
+    })
+
+    describe('market', async () => {
+
+        it('return unsold items', async () => {
+            console.log(await market.getUnsoldItems());
+        })    
+    
+    })
 
 })
