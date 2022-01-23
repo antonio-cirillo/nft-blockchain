@@ -14,7 +14,7 @@ contract Drawing is ERC721URIStorage {
 
     address contractAddress;
 
-    constructor(address marketplaceAddress) ERC721("Drawing", "DRAW") public { 
+    constructor(address marketplaceAddress) ERC721("Drawing", "DRAW") { 
         contractAddress = marketplaceAddress;
     }
 
@@ -36,9 +36,35 @@ contract Drawing is ERC721URIStorage {
     
     }
 
-    function test() public returns (uint256) {
-        _tokenIds.increment();
-        return _tokenIds.current();
+    function getMyTokens() public view returns (string[] memory) {
+        
+        uint256 totalTokenCount = _tokenIds.current();
+        require(totalTokenCount > 0, "There are no tokens.");
+
+        uint256 myTotalTokenCount = 0;
+
+        for (uint256 i = 1; i < totalTokenCount + 1; i++) {            
+            // If item at index i is owned by msg.sender
+            if (super.ownerOf(i) == msg.sender)
+                myTotalTokenCount++;
+        }
+
+        require(myTotalTokenCount > 0, "Caller must be have at least 1 token.");
+
+        uint256 currentIndex = 0;
+        string[] memory myTokens = new string[](myTotalTokenCount);
+        
+        for (uint256 i = 1; i < totalTokenCount + 1; i++) {
+            // If item at index i is owned by msg.sender
+            if (super.ownerOf(i) == msg.sender) {
+                // Add to array and increment index of array
+                myTokens[currentIndex] = super.tokenURI(i);
+                currentIndex++; 
+            }
+        }
+        
+        return myTokens;
+
     }
 
     // Format: data:image/svg+xml;base64,(Base64-encoding)
