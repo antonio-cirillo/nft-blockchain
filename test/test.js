@@ -1,5 +1,7 @@
 const fs = require('fs');
 const { assert } = require('chai');
+const { expectRevert } = require('@openzeppelin/test-helpers')
+const ethers = require('ethers');
 
 const Drawing = artifacts.require('Drawing');
 const DrawingMarket = artifacts.require('DrawingMarket');
@@ -14,9 +16,9 @@ contract('Drawing', (accounts) => {
     let contract;
     let market;
 
-    before(async () => {
-        contract = await Drawing.deployed();
-        market = await DrawingMarket.deployed();
+    beforeEach(async () => {
+        market = await DrawingMarket.new({ from: accounts[0] });
+        contract = await Drawing.new(market.address, { from: accounts[0] });
     })
 
     describe('deployment', async () => {
@@ -41,7 +43,7 @@ contract('Drawing', (accounts) => {
 
     })
     
-    describe('create', async () => {
+    describe('create nft', async () => {
 
         it('svgToImageURI', async () => {
             const image = fs.readFileSync('./test/image.svg', { encoding: 'utf-8' });
@@ -61,18 +63,60 @@ contract('Drawing', (accounts) => {
             const name = 'name';
             const description = 'description';
             const image = 'image';
-            const tokenId = await contract.createToken(name, description, image);
-            assert.isNotNull(tokenId);
+            const tx = await contract.createToken(name, description, image);
+            const tokenId = tx.logs[2].args['2'].words[0];
+            assert.equal(1, tokenId);
+            
+            const tokenURI = await contract.tokenURI(1);
+            assert.equal(tokenURI, 'data:application/json;base64,eyJuYW1lIjogIm5hbWUiLCAiZGVzY3JpcHRpb24iOiAiZGVzY3JpcHRpb24iLCAiYXR0cmlidXRlcyI6ICIiLCAiaW1hZ2UiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxhVzFoWjJVPSIgfQ==');    
         });
 
     })
 
-    describe('market', async () => {
+    describe('create market', async () => {
 
-        it('return unsold items', async () => {
-            console.log(await market.getUnsoldItems());
-        })    
-    
-    })
+        it('Price must be at least 1 wei.', async () => {
+
+            let listingPrice = await market.getListingPrice();
+            listingPrice = listingPrice;
+            
+            const name = 'name';
+            const description = 'description';
+            const image = 'image';
+            let tx = await contract.createToken(name, description, image);
+            const tokenId = tx.logs[2].args['2'].words[0];
+            assert.equal(1, tokenId);
+
+            const auctionPrice = ethers.utils.parseUnits('0', 'ether');
+
+            await expectRevert(
+                market.create(contract.address, tokenId, auctionPrice, { value: listingPrice }),
+                'Price must be at least 1 wei.'
+            );
+
+        });
+
+        it('Price must be equal to listing price.', async () => {
+
+            let listingPrice = await market.getListingPrice();
+            listingPrice = listingPrice;
+            
+            const name = 'name';
+            const description = 'description';
+            const image = 'image';
+            let tx = await contract.createToken(name, description, image);
+            const tokenId = tx.logs[2].args['2'].words[0];
+            assert.equal(1, tokenId);
+
+            const auctionPrice = ethers.utils.parseUnits('1', 'ether');
+
+            await expectRevert(
+                market.create(contract.address, tokenId, auctionPrice, { value: auctionPrice }),
+                'Price must be equal to listing price.'
+            );
+
+        });
+
+    });
 
 })
