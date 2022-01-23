@@ -14,6 +14,9 @@ contract DrawingMarket is ReentrancyGuard {
     address payable owner;
     uint256 listingPrice = 0.0025 ether;
 
+    event ItemCreated(uint itemId, address nftContract, uint256 tokenId, address seller, 
+        address owner, uint256 price, bool sold);
+
     constructor() {
         owner = payable(msg.sender);
     }
@@ -52,6 +55,8 @@ contract DrawingMarket is ReentrancyGuard {
             price,
             false
         );
+
+        emit ItemCreated(itemId, nftContract, tokenId, msg.sender, address(0), price, false);
 
         // Transfer NFT from creator to DrawingMarket contract
         IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
