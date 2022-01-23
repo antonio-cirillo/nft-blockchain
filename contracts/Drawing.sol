@@ -10,6 +10,8 @@ contract Drawing is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
+    event TokenCreated(string imageURI, string tokenURI, uint256 tokenId);
+
     address contractAddress;
 
     constructor(address marketplaceAddress) ERC721("Drawing", "DRAW") public { 
@@ -17,19 +19,26 @@ contract Drawing is ERC721URIStorage {
     }
 
     function createToken(string memory name, string memory description, 
-            string memory svg) public returns (uint) {
+            string memory svg) public returns (uint256) {
 
         _tokenIds.increment();
-        uint256 tokenCounter = _tokenIds.current();
+        uint256 tokenId = _tokenIds.current();
 
-        _safeMint(msg.sender, tokenCounter);
+        _safeMint(msg.sender, tokenId);
         string memory imageURI = svgToImageURI(svg);
         string memory tokenURI = createTokenURI(name, description, imageURI);
-        _setTokenURI(tokenCounter, tokenURI);
+        _setTokenURI(tokenId, tokenURI);
         setApprovalForAll(contractAddress, true);
         
-        return tokenCounter;
+        emit TokenCreated(imageURI, tokenURI, tokenId);
+
+        return tokenId;
     
+    }
+
+    function test() public returns (uint256) {
+        _tokenIds.increment();
+        return _tokenIds.current();
     }
 
     // Format: data:image/svg+xml;base64,(Base64-encoding)
