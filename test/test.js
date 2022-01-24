@@ -239,4 +239,102 @@ contract('Drawing', (accounts) => {
 
     });
 
+    describe('create market sale', async () => {
+
+        it('Please submit the asking price in order to complete the purchase.', async () => {
+
+            // Market was deployed by accounts[0], test creation with accounts[1]
+            const seller = accounts[1];
+
+            let listingPrice = await market.getListingPrice();
+            
+            const name = 'name';
+            const description = 'description';
+            const image = 'image';
+            let tx = await contract.createToken(name, description, image, { from: seller });
+            const tokenId = tx.logs[2].args['2'].words[0];
+            assert.equal(1, tokenId);
+            assert.equal(await contract.ownerOf(tokenId), seller);
+
+            const auctionPrice = ethers.utils.parseUnits('1', 'ether');
+
+            tx = await market.create(contract.address, tokenId, auctionPrice, {
+                from: seller,
+                value: listingPrice 
+            });
+
+            expectEvent(tx, 'ItemCreated', {
+                itemId: new BN(1),
+                nftContract: contract.address,
+                tokenId: new BN(tokenId),
+                seller: seller,
+                owner: constants.ZERO_ADDRESS,
+                price: new BN("1000000000000000000"),
+                sold: false
+            });
+
+            // NFT is now owned by smart contract
+            assert.equal(await contract.ownerOf(tokenId), market.address);
+
+            const buyer = accounts[2];
+            const offeredPrice = ethers.utils.parseUnits('0.5', 'ether');
+
+            await expectRevert(
+                market.createMarketSale(contract.address, new BN(1), { 
+                    from: buyer,
+                    value: offeredPrice 
+                }),
+                'Please submit the asking price in order to complete the purchase.'
+            );
+
+        });
+
+        it('buying an item', async () => {
+
+            // Market was deployed by accounts[0], test creation with accounts[1]
+            const seller = accounts[1];
+
+            let listingPrice = await market.getListingPrice();
+            
+            const name = 'name';
+            const description = 'description';
+            const image = 'image';
+            let tx = await contract.createToken(name, description, image, { from: seller });
+            const tokenId = tx.logs[2].args['2'].words[0];
+            assert.equal(1, tokenId);
+            assert.equal(await contract.ownerOf(tokenId), seller);
+
+            const auctionPrice = ethers.utils.parseUnits('1', 'ether');
+
+            tx = await market.create(contract.address, tokenId, auctionPrice, {
+                from: seller,
+                value: listingPrice 
+            });
+
+            expectEvent(tx, 'ItemCreated', {
+                itemId: new BN(1),
+                nftContract: contract.address,
+                tokenId: new BN(tokenId),
+                seller: seller,
+                owner: constants.ZERO_ADDRESS,
+                price: new BN("1000000000000000000"),
+                sold: false
+            });
+
+            // NFT is now owned by smart contract
+            assert.equal(await contract.ownerOf(tokenId), market.address);
+
+            const buyer = accounts[2];
+            tx = await market.createMarketSale(contract.address, new BN(1), { 
+                from: buyer,
+                value: auctionPrice 
+            });
+
+            // NFT is now owned by buyer
+            assert.equal(await contract.ownerOf(tokenId), buyer);
+
+        });
+
+    });
+
 })
