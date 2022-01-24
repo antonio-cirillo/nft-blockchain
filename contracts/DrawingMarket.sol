@@ -14,15 +14,15 @@ contract DrawingMarket is ReentrancyGuard {
     address payable owner;
     uint256 listingPrice = 0.0025 ether;
 
-    event ItemCreated(uint itemId, address nftContract, uint256 tokenId, address seller, 
-        address owner, uint256 price, bool sold);
+    event ItemCreated(uint256 itemId, address nftContract, uint256 tokenId, 
+        address seller, address owner, uint256 price, bool sold);
 
     constructor() {
         owner = payable(msg.sender);
     }
 
     struct Item {
-        uint itemId;
+        uint256 itemId;
         address nftContract;
         uint256 tokenId;
         address payable seller;
