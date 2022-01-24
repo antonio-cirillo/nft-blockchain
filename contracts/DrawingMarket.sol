@@ -69,7 +69,7 @@ contract DrawingMarket is ReentrancyGuard {
         uint price = _idToItem[itemId].price;
         uint tokenId = _idToItem[itemId].tokenId;
 
-        require(msg.value == price, "Please submit the asking price in order to complete the purchase");
+        require(msg.value == price, "Please submit the asking price in order to complete the purchase.");
 
         // Send money to seller
         _idToItem[itemId].seller.transfer(msg.value);
