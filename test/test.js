@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { assert } = require('chai');
-const { BN, expectRevert, expectEvent } = require('@openzeppelin/test-helpers')
+const { BN, expectRevert, expectEvent, constants } = require('@openzeppelin/test-helpers')
 const ethers = require('ethers');
 
 const Drawing = artifacts.require('Drawing');
@@ -213,6 +213,7 @@ contract('Drawing', (accounts) => {
             let tx = await contract.createToken(name, description, image, { from: address });
             const tokenId = tx.logs[2].args['2'].words[0];
             assert.equal(1, tokenId);
+            assert.equal(await contract.ownerOf(tokenId), address);
 
             const auctionPrice = ethers.utils.parseUnits('1', 'ether');
 
@@ -221,9 +222,19 @@ contract('Drawing', (accounts) => {
                 value: listingPrice 
             });
 
-            console.log(tx.logs[0].args);
-            console.log(new BN(1));
-        
+            expectEvent(tx, 'ItemCreated', {
+                itemId: new BN(1),
+                nftContract: contract.address,
+                tokenId: new BN(tokenId),
+                seller: address,
+                owner: constants.ZERO_ADDRESS,
+                price: new BN("1000000000000000000"),
+                sold: false
+            });
+
+            // NFT is now owned by smart contract
+            assert.equal(await contract.ownerOf(tokenId), market.address);
+
         });
 
     });
