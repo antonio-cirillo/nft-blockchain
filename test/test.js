@@ -61,15 +61,17 @@ contract('Drawing', (accounts) => {
             const name = 'name';
             const description = 'description';
             const image = 'image';
-            const tokenURI = await contract.createTokenURI(name, description, image);
-            assert.equal(tokenURI, 'data:application/json;base64,eyJuYW1lIjogIm5hbWUiLCAiZGVzY3JpcHRpb24iOiAiZGVzY3JpcHRpb24iLCAiYXR0cmlidXRlcyI6ICIiLCAiaW1hZ2UiOiAiaW1hZ2UiIH0=')
+            const imageURI = await contract.svgToImageURI(image);
+            const tokenURI = await contract.createTokenURI(name, description, imageURI);
+            assert.equal(tokenURI, 'data:application/json;base64,eyJuYW1lIjogIm5hbWUiLCAiZGVzY3JpcHRpb24iOiAiZGVzY3JpcHRpb24iLCAiYXR0cmlidXRlcyI6ICIiLCAiaW1hZ2UiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxhVzFoWjJVPSIgfQ==');
         });
 
         it('createToken', async () => {
             const name = 'name';
             const description = 'description';
             const image = 'image';
-            const tx = await contract.createToken(name, description, image);
+            const imageURI = await contract.svgToImageURI(image);
+            const tx = await contract.createToken(name, description, imageURI);
             const tokenId = tx.logs[2].args['2'].words[0];
             assert.equal(1, tokenId);
             
@@ -92,7 +94,8 @@ contract('Drawing', (accounts) => {
             const name = 'name';
             const description = 'description';
             const image = 'image';
-            const tx = await contract.createToken(name, description, image);
+            const imageURI = await contract.svgToImageURI(image);
+            const tx = await contract.createToken(name, description, imageURI);
             const tokenId = tx.logs[2].args['2'].words[0];
             assert.equal(1, tokenId);
             
@@ -111,7 +114,8 @@ contract('Drawing', (accounts) => {
             const name1 = 'name1';
             const description1 = 'description1';
             const image1 = 'image1';
-            const tx1 = await contract.createToken(name1, description1, image1);
+            const imageURI1 = await contract.svgToImageURI(image1);
+            const tx1 = await contract.createToken(name1, description1, imageURI1);
             const tokenId1 = tx1.logs[2].args['2'].words[0];
             assert.equal(1, tokenId1);
             
@@ -123,7 +127,8 @@ contract('Drawing', (accounts) => {
             const name2 = 'name2';
             const description2 = 'description2';
             const image2 = 'image2';
-            const tx2 = await contract.createToken(name2, description2, image2);
+            const imageURI2 = await contract.svgToImageURI(image2);
+            const tx2 = await contract.createToken(name2, description2, imageURI2);
             const tokenId2 = tx2.logs[2].args['2'].words[0];
             assert.equal(2, tokenId2);
             
@@ -135,7 +140,8 @@ contract('Drawing', (accounts) => {
             const name3 = 'name3';
             const description3 = 'description3';
             const image3 = 'image3';
-            const tx3 = await contract.createToken(name3, description3, image3, { from: accounts[1] });
+            const imageURI3 = await contract.svgToImageURI(image3);
+            const tx3 = await contract.createToken(name3, description3, imageURI3, { from: accounts[1] });
             const tokenId3 = tx3.logs[2].args['2'].words[0];
             assert.equal(3, tokenId3);
             
