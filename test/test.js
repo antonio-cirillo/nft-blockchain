@@ -150,13 +150,15 @@ contract('Drawing', (accounts) => {
             assert.equal(await contract.ownerOf(tokenId3), accounts[1]);
 
             // Retrive tokens owned by accounts[0]
-            const tokensOwnedByAccounts0 = await contract.getMyTokens({ from: accounts[0] });
+            const recepit = await contract.getMyTokens({ from: accounts[0] });
+            const tokensOwnedByAccounts0 = recepit[0];
             assert.equal(tokensOwnedByAccounts0.length, 2);
             assert.equal(tokensOwnedByAccounts0[0], tokenURI1);
             assert.equal(tokensOwnedByAccounts0[1], tokenURI2);
 
             // Retrive tokens owned by accounts[1]
-            const tokensOwnedByAccounts1 = await contract.getMyTokens({ from: accounts[1] });
+            const recepit1 = await contract.getMyTokens({ from: accounts[1] });
+            const tokensOwnedByAccounts1 = recepit1[0];
             assert.equal(tokensOwnedByAccounts1.length, 1);
             assert.equal(tokensOwnedByAccounts1[0], tokenURI3);
 
