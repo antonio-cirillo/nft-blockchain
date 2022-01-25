@@ -25,12 +25,11 @@ contract Drawing is ERC721URIStorage {
         uint256 tokenId = _tokenIds.current();
 
         _safeMint(msg.sender, tokenId);
-        string memory imageURI = svgToImageURI(svg);
-        string memory tokenURI = createTokenURI(name, description, imageURI);
+        string memory tokenURI = createTokenURI(name, description, svg);
         _setTokenURI(tokenId, tokenURI);
         setApprovalForAll(contractAddress, true);
         
-        emit TokenCreated(imageURI, tokenURI, tokenId);
+        emit TokenCreated(svg, tokenURI, tokenId);
 
         return tokenId;
     
