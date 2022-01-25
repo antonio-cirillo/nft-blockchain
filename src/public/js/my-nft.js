@@ -67,14 +67,21 @@ App = {
             }
 
             const account = accounts[0];
-            App.contracts.Drawing.deployed().then(function(instance) {
+            App.contracts.Drawing.deployed().then(async function(instance) {
                 drawingInstance = instance;
 
-                return drawingInstance.getMyTokens({ from: account });
-            }).then(function(result) {
-                
-            }).catch(function(err) {
-                
+                try {
+                    const items = await drawingInstance.getMyTokens({ from: account });
+                    for (const item of items) {
+                        const json = atob(item.substring(29));
+                        const result = JSON.parse(json);
+                        $("#items").append(createItem(result));
+                    }
+                } catch (error) {
+                    console.log(error);
+                    $("#items").append("<p>Al momento non possiedi nessun token!</p>")
+                }
+
             });
 
         });
@@ -88,3 +95,34 @@ $(function() {
         App.init();
     });
 });
+
+const createItem = (result) => {
+    const item = `<div class="col-sm-6 col-md-4 product-item animation-element slide-top-left">`
+        + `<div class="product-container" style="height: 100%;padding-bottom: 0px;">`
+        + `<div class="row">`
+        + `<div class="col-md-12"><img class="img-fluid" src="${result.image}" style="display: block;margin-left: auto;margin-right: auto"></div>`
+        + `</div>`
+        + `<div class="row">`
+        + `<div class="col-12">`
+        + `<h2 style="color: rgb(78,115,225);margin-top: 20px">${result.name}</h2>`
+        + `</div>`
+        + `</div>`
+        + `<div class="row">`
+        + `<div class="col-12">`
+        + `<p class="product-description" style="margin-top: 0px;margin-bottom: 10px">${result.description}</p>`
+        + `</div>`
+        + `</div>`
+        + `<div class="card shadow mb-4" style="margin-top: 12px;">`
+        + `<div class="card-header py-3">`
+        + `<h6 class="m-0 fw-bold" style="color: rgb(78,115,225)">You want to sell this token?</h6>`
+        + `</div>`
+        + `<div class="card-body">`
+        + `<div class="user">`
+        + `<div class="mb-3"><input class="form-control form-control-user" placeholder="Enter price in ETH" name="price"></div><button class="btn btn-primary d-block btn-user w-100" type="submit" style="background: rgb(78,115,225);">Sell Now!</button>`
+        + `</div>`
+        + `</div>`
+        + `</div>`
+        + `</div>`
+        + `</div>`
+    return item;
+}

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Create NFT</title>
     <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -25,40 +26,19 @@
         </div>
     </nav>
     
-    <div id="wrapper">
-        <div class="d-flex flex-column" id="content-wrapper">
-            <div id="content">
-                <div class="container-fluid">
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="text-primary fw-bold m-0">My NFT</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row product-list dev">
-                                <div class="col-sm-6 col-md-4 product-item animation-element slide-top-left">
-                                    <div class="product-container" style="height: 100%;padding-bottom: 0px;">
-                                        <div class="row">
-                                            <div class="col-md-12"><a class="product-image" href="#"><img class="img-fluid" src="assets/img/avatars/avatar2.jpeg"></a></div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h2><a href="#" style="color: rgb(78,115,225);">iPhone 6s</a></h2>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <p class="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ornare sem sed nisl dignissim, facilisis dapibus lacus vulputate. Sed lacinia lacinia magna. </p>
-                                            </div>
-                                        </div>
-                                        <div class="card shadow mb-4" style="margin-top: 12px;">
-                                            <div class="card-header py-3">
-                                                <h6 class="text-primary m-0 fw-bold">You want to sell this token?</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <form class="user">
-                                                    <div class="mb-3"><input class="form-control form-control-user" type="email" id="exampleInputEmail-1" aria-describedby="emailHelp" placeholder="Enter price in ETH" name="price"></div><button class="btn btn-primary d-block btn-user w-100" type="submit" style="background: rgb(78,115,225);">Sell Now!</button>
-                                                </form>
-                                            </div>
+    <main class="page hire-me-page">
+        <section class="portfolio-block hire-me" style="padding-top: 25px">
+            <div class="container">
+                <div id="wrapper">
+                    <div class="d-flex flex-column" id="content-wrapper">
+                        <div id="content">
+                            <div class="container-fluid">
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3">
+                                        <h6 class="text-primary fw-bold m-0">My NFT</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row product-list dev" id="items">
                                         </div>
                                     </div>
                                 </div>
@@ -67,8 +47,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0/web3.min.js" integrity="sha512-C63V0mFzwl8KV2fRz0QJNKX0d9877urOLSUq5WUq8nUOhDl69hKdGr9mAvl57k47GNjqEMAtiufsvDnk7xs8+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -78,6 +58,10 @@
 
     <script src="./js/bootstrap.min.js"></script>
     <script src="./js/my-nft.js"></script>
+    <script src="./js/item.js"></script>
+
+    <% if (created) { %><script>$(document).ready(() => toastr.success("A new token is added in your collection!"));</script><% } %>
+    <% if (error) { %><script>$(document).ready(() => toastr.error("Ops! Something went wrong."));</script><% } %>
 
 </body>
 
