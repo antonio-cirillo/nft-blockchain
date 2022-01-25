@@ -35,7 +35,7 @@ contract Drawing is ERC721URIStorage {
     
     }
 
-    function getMyTokens() public view returns (string[] memory) {
+    function getMyTokens() public view returns (string[] memory, uint256[] memory) {
         
         uint256 totalTokenCount = _tokenIds.current();
         require(totalTokenCount > 0, "There are no tokens.");
@@ -51,6 +51,7 @@ contract Drawing is ERC721URIStorage {
         require(myTotalTokenCount > 0, "Caller must be have at least 1 token.");
 
         uint256 currentIndex = 0;
+        uint256[] memory ids = new uint256[](myTotalTokenCount);
         string[] memory myTokens = new string[](myTotalTokenCount);
         
         for (uint256 i = 1; i < totalTokenCount + 1; i++) {
@@ -58,11 +59,12 @@ contract Drawing is ERC721URIStorage {
             if (super.ownerOf(i) == msg.sender) {
                 // Add to array and increment index of array
                 myTokens[currentIndex] = super.tokenURI(i);
+                ids[currentIndex] = i;
                 currentIndex++; 
             }
         }
         
-        return myTokens;
+        return (myTokens, ids);
 
     }
 
