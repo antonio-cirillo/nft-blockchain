@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Create NFT</title>
+    <title>My NFT</title>
     <link rel="stylesheet" href="./css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700">
@@ -61,6 +61,7 @@
     <script src="./js/item.js"></script>
 
     <% if (created) { %><script>$(document).ready(() => toastr.success("A new token is added in your collection!"));</script><% } %>
+    <% if (selling) { %><script>$(document).ready(() => toastr.success("Your token is now in selling!"));</script><% } %>
     <% if (error) { %><script>$(document).ready(() => toastr.error("Ops! Something went wrong."));</script><% } %>
 
 </body>
