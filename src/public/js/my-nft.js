@@ -71,19 +71,63 @@ App = {
                 drawingInstance = instance;
 
                 try {
-                    const items = await drawingInstance.getMyTokens({ from: account });
-                    for (const item of items) {
+                    const results = await drawingInstance.getMyTokens({ from: account });
+                    const items = results[0];
+                    const ids = results[1];
+                    for (const [index, item] of Object.entries(items)) {
                         const json = atob(item.substring(29));
                         const result = JSON.parse(json);
+                        result.tokenId = ids[index].words[0];
                         $("#items").append(createItem(result));
                     }
                 } catch (error) {
                     console.log(error);
-                    $("#items").append("<p>Al momento non possiedi nessun token!</p>")
+                    $("#items").append("<p>You currently don't have any tokens!</p>")
                 }
 
             });
 
+        });
+
+    },
+
+    create: async (tokenId, price) => {
+        let drawingMarketInstance;
+        let drawingInstance;
+
+        await web3.eth.getAccounts(function(error, accounts) {
+            
+            if (error) {
+                console.log(error);
+            }
+
+            const account = accounts[0];
+            App.contracts.Drawing.deployed().then(function (instance) {
+                
+                drawingInstance = instance;
+                
+                App.contracts.DrawingMarket.deployed().then(async function(instance) {
+                
+                    drawingMarketInstance = instance;
+    
+                    try {
+                        
+                        const listingPrice = await drawingMarketInstance.getListingPrice();
+                        await drawingMarketInstance.create(drawingInstance.address, tokenId, price, {
+                            from: account,
+                            value: listingPrice
+                        });
+                        
+                        window.location.href = "./my-nft?action=selling";
+    
+                    } catch (error) {
+                        window.location.href = "./my-nft?action=error";
+                    }
+    
+                });
+    
+            })
+            
         });
 
     }
@@ -118,11 +162,30 @@ const createItem = (result) => {
         + `</div>`
         + `<div class="card-body">`
         + `<div class="user">`
-        + `<div class="mb-3"><input class="form-control form-control-user" placeholder="Enter price in ETH" name="price"></div><button class="btn btn-primary d-block btn-user w-100" type="submit" style="background: rgb(78,115,225);">Sell Now!</button>`
+        + `<div class="mb-3"><input id="price${result.tokenId}" class="form-control form-control-user" placeholder="Enter price in ETH" name="price"></div><button class="btn btn-primary d-block btn-user w-100" onclick="sell(${result.tokenId})" type="submit" style="background: rgb(78,115,225);">Sell Now!</button>`
         + `</div>`
         + `</div>`
         + `</div>`
         + `</div>`
         + `</div>`
     return item;
+}
+
+async function sell(tokenId) {
+
+    const price = $(`#price${tokenId}`).val();
+    if (price == '') {
+        toastr.error("Price is not valid!");
+    } else {
+        if (!/(([0-9]+)(\.[0-9]+)?)/.test(price)) {
+            toastr.error("Price is not valid!");
+        } else {
+            if (price <= 0) {
+                toastr.error("Price is not valid!");
+            } else {
+                await App.create(tokenId, price);
+            }
+        }
+    }
+
 }
