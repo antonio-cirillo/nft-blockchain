@@ -1,5 +1,3 @@
-let value;
-
 App = {
 
     web3Provider: null,
@@ -136,10 +134,10 @@ const createItem = (result) => {
         + `<div class="card-header py-3">`
         + `<h6 class="m-0 fw-bold" style="color: rgb(78,115,225)">You want to sell this token?</h6>`
         + `</div>`
-        + `<div class="card-body">`
-        + `<div class="user">`
-        + `<div class="mb-3"><input id="price${result.tokenId}" class="form-control form-control-user" placeholder="Enter price in ETH" name="price"></div><button class="btn btn-primary d-block btn-user w-100" onclick="sell(${result.tokenId})" type="submit" style="background: rgb(78,115,225);">Sell Now!</button>`
-        + `</div>`
+        + `<div class="row">`
+        + `<div class="col-6"><button class="btn btn-light" type="button">Buy Now!</button></div>`
+        + `<div class="col-6">`
+        + `<p class="product-price">$599.00 </p>`
         + `</div>`
         + `</div>`
         + `</div>`
