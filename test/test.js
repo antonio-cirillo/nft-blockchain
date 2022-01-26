@@ -18,7 +18,7 @@ contract('Drawing', (accounts) => {
 
     beforeEach(async () => {
         market = await DrawingMarket.new({ from: accounts[0] });
-        contract = await Drawing.new(market.address, { from: accounts[0] });
+        contract = await Drawing.new({ from: accounts[0] });
     })
 
     describe('deployment', async () => {
@@ -72,7 +72,7 @@ contract('Drawing', (accounts) => {
             const image = 'image';
             const imageURI = await contract.svgToImageURI(image);
             const tx = await contract.createToken(name, description, imageURI);
-            const tokenId = tx.logs[2].args['2'].words[0];
+            const tokenId = tx.logs[1].args['2'].words[0];
             assert.equal(1, tokenId);
             
             const tokenURI = await contract.tokenURI(1);
@@ -96,7 +96,7 @@ contract('Drawing', (accounts) => {
             const image = 'image';
             const imageURI = await contract.svgToImageURI(image);
             const tx = await contract.createToken(name, description, imageURI);
-            const tokenId = tx.logs[2].args['2'].words[0];
+            const tokenId = tx.logs[1].args['2'].words[0];
             assert.equal(1, tokenId);
             
             const tokenURI = await contract.tokenURI(1);
@@ -116,7 +116,7 @@ contract('Drawing', (accounts) => {
             const image1 = 'image1';
             const imageURI1 = await contract.svgToImageURI(image1);
             const tx1 = await contract.createToken(name1, description1, imageURI1);
-            const tokenId1 = tx1.logs[2].args['2'].words[0];
+            const tokenId1 = tx1.logs[1].args['2'].words[0];
             assert.equal(1, tokenId1);
             
             const tokenURI1 = await contract.tokenURI(1);
@@ -129,7 +129,7 @@ contract('Drawing', (accounts) => {
             const image2 = 'image2';
             const imageURI2 = await contract.svgToImageURI(image2);
             const tx2 = await contract.createToken(name2, description2, imageURI2);
-            const tokenId2 = tx2.logs[2].args['2'].words[0];
+            const tokenId2 = tx2.logs[1].args['2'].words[0];
             assert.equal(2, tokenId2);
             
             const tokenURI2 = await contract.tokenURI(2);
@@ -142,7 +142,7 @@ contract('Drawing', (accounts) => {
             const image3 = 'image3';
             const imageURI3 = await contract.svgToImageURI(image3);
             const tx3 = await contract.createToken(name3, description3, imageURI3, { from: accounts[1] });
-            const tokenId3 = tx3.logs[2].args['2'].words[0];
+            const tokenId3 = tx3.logs[1].args['2'].words[0];
             assert.equal(3, tokenId3);
             
             const tokenURI3 = await contract.tokenURI(3);
@@ -176,7 +176,7 @@ contract('Drawing', (accounts) => {
             const description = 'description';
             const image = 'image';
             let tx = await contract.createToken(name, description, image);
-            const tokenId = tx.logs[2].args['2'].words[0];
+            const tokenId = tx.logs[1].args['2'].words[0];
             assert.equal(1, tokenId);
 
             const auctionPrice = ethers.utils.parseUnits('0', 'ether');
@@ -196,7 +196,7 @@ contract('Drawing', (accounts) => {
             const description = 'description';
             const image = 'image';
             let tx = await contract.createToken(name, description, image);
-            const tokenId = tx.logs[2].args['2'].words[0];
+            const tokenId = tx.logs[1].args['2'].words[0];
             assert.equal(1, tokenId);
 
             const auctionPrice = ethers.utils.parseUnits('1', 'ether');
@@ -219,11 +219,15 @@ contract('Drawing', (accounts) => {
             const description = 'description';
             const image = 'image';
             let tx = await contract.createToken(name, description, image, { from: address });
-            const tokenId = tx.logs[2].args['2'].words[0];
+            const tokenId = tx.logs[1].args['2'].words[0];
             assert.equal(1, tokenId);
             assert.equal(await contract.ownerOf(tokenId), address);
 
             const auctionPrice = ethers.utils.parseUnits('1', 'ether');
+
+            await contract.setApprovalForAll(market.address, true, {
+                from: address
+            });
 
             tx = await market.create(contract.address, tokenId, auctionPrice, {
                 from: address,
@@ -260,11 +264,15 @@ contract('Drawing', (accounts) => {
             const description = 'description';
             const image = 'image';
             let tx = await contract.createToken(name, description, image, { from: seller });
-            const tokenId = tx.logs[2].args['2'].words[0];
+            const tokenId = tx.logs[1].args['2'].words[0];
             assert.equal(1, tokenId);
             assert.equal(await contract.ownerOf(tokenId), seller);
 
             const auctionPrice = ethers.utils.parseUnits('1', 'ether');
+
+            await contract.setApprovalForAll(market.address, true, {
+                from: seller
+            });
 
             tx = await market.create(contract.address, tokenId, auctionPrice, {
                 from: seller,
@@ -308,12 +316,14 @@ contract('Drawing', (accounts) => {
             const description = 'description';
             const image = 'image';
             let tx = await contract.createToken(name, description, image, { from: seller });
-            const tokenId = tx.logs[2].args['2'].words[0];
+            const tokenId = tx.logs[1].args['2'].words[0];
             assert.equal(1, tokenId);
             assert.equal(await contract.ownerOf(tokenId), seller);
 
             const auctionPrice = ethers.utils.parseUnits('1', 'ether');
-
+            await contract.setApprovalForAll(market.address, true, {
+                from: seller
+            });
             tx = await market.create(contract.address, tokenId, auctionPrice, {
                 from: seller,
                 value: listingPrice 
@@ -331,7 +341,6 @@ contract('Drawing', (accounts) => {
 
             // NFT is now owned by smart contract
             assert.equal(await contract.ownerOf(tokenId), market.address);
-
             const buyer = accounts[2];
             tx = await market.createMarketSale(contract.address, new BN(1), { 
                 from: buyer,
@@ -342,7 +351,6 @@ contract('Drawing', (accounts) => {
             assert.equal(await contract.ownerOf(tokenId), buyer);
 
         });
-
     });
 
-})
+});
