@@ -12,11 +12,7 @@ contract Drawing is ERC721URIStorage {
 
     event TokenCreated(string imageURI, string tokenURI, uint256 tokenId);
 
-    address contractAddress;
-
-    constructor(address marketplaceAddress) ERC721("Drawing", "DRAW") { 
-        contractAddress = marketplaceAddress;
-    }
+    constructor() ERC721("Drawing", "DRAW") { }
 
     function createToken(string memory name, string memory description, 
             string memory svg) public returns (uint256) {
@@ -27,7 +23,6 @@ contract Drawing is ERC721URIStorage {
         _safeMint(msg.sender, tokenId);
         string memory tokenURI = createTokenURI(name, description, svg);
         _setTokenURI(tokenId, tokenURI);
-        setApprovalForAll(contractAddress, true);
         
         emit TokenCreated(svg, tokenURI, tokenId);
 
