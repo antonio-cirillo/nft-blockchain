@@ -109,11 +109,16 @@ App = {
                 App.contracts.DrawingMarket.deployed().then(async function(instance) {
                 
                     drawingMarketInstance = instance;
-    
+
                     try {
                         
+                        const priceInWei = await web3.utils.toWei(price);
+
                         const listingPrice = await drawingMarketInstance.getListingPrice();
-                        await drawingMarketInstance.create(drawingInstance.address, tokenId, price, {
+                        await drawingInstance.setApprovalForAll(drawingMarketInstance.address, true, {
+                            from: account
+                        });
+                        await drawingMarketInstance.create(drawingInstance.address, tokenId, priceInWei, {
                             from: account,
                             value: listingPrice
                         });
@@ -177,7 +182,7 @@ async function sell(tokenId) {
     if (price == '') {
         toastr.error("Price is not valid!");
     } else {
-        if (!/(([0-9]+)(\.[0-9]+)?)/.test(price)) {
+        if (!/^(([0-9]+)(\.[0-9]+)?)$/.test(price)) {
             toastr.error("Price is not valid!");
         } else {
             if (price <= 0) {
