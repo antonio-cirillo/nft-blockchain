@@ -62,6 +62,7 @@
 
     <% if (created) { %><script>$(document).ready(() => toastr.success("A new token is added in your collection!"));</script><% } %>
     <% if (selling) { %><script>$(document).ready(() => toastr.success("Your token is now in selling!"));</script><% } %>
+    <% if (buyed) { %><script>$(document).ready(() => toastr.success("Purchase made successfully!"));</script><% } %>
     <% if (error) { %><script>$(document).ready(() => toastr.error("Ops! Something went wrong."));</script><% } %>
 
 </body>
