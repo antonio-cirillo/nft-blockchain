@@ -55,6 +55,7 @@ App = {
 
     getUnsoldItems: async () => {
         let drawingMarketInstance;
+        let drawingInstance;
 
         web3.eth.handleRevert = true;
 
@@ -65,28 +66,43 @@ App = {
             }
 
             const account = accounts[0];
-            App.contracts.DrawingMarket.deployed().then(async function(instance) {
-                drawingMarketInstance = instance;
 
-                try {
-                    const items = await drawingMarketInstance.getUnsoldItems({ from: account });
-                    for (const item of items) {
-                        console.log(item)
+            App.contracts.Drawing.deployed().then(function(instance) {
+                drawingInstance = instance;
+                
+                App.contracts.DrawingMarket.deployed().then(async function(instance) {
+                    drawingMarketInstance = instance;
+    
+                    try {
+
+                        const items = await drawingMarketInstance.getUnsoldItems({ from: account });
+                        if (items.length > 0) {
+                            for (const item of items) {
+                                const tokenId = item[2];
+                                const tokenURI = await drawingInstance.tokenURI(tokenId);
+                                const json = atob(tokenURI.substring(29));
+                                const result = JSON.parse(json);
+                                result.itemId = item[0];
+                                result.price = item[5];
+                                $("#items").append(createItem(result));
+                            }
+                        } else {
+                            $("#items").append("<p>There are currently no tokens for sale!</p>")
+                        }
+                    } catch (error) {
+                        $("#items").append("<p>There are currently no tokens for sale!</p>")
                     }
-                } catch (error) {
-                    console.log(error);
-                    $("#items").append("<p>There are currently no tokens for sale!</p>")
-                }
+    
+                });
 
-            });
+            })
 
         });
 
     },
 
-    createMarketSale: async (tokenId, price) => {
+    createMarketSale: async (itemId, price) => {
         let drawingMarketInstance;
-        let drawingInstance;
 
         await web3.eth.getAccounts(function(error, accounts) {
             
@@ -96,9 +112,25 @@ App = {
 
             const account = accounts[0];
 
-            App.contracts.DrawingMarket.deployed().then(async function(instance) {
-                
-                drawingMarketInstance = instance;
+            App.contracts.Drawing.deployed().then(function(instance) {
+                drawingInstance = instance;
+
+                App.contracts.DrawingMarket.deployed().then(async function(instance) {
+                    drawingMarketInstance = instance;
+
+                    try {
+
+                        await drawingMarketInstance.createMarketSale(drawingInstance.address, itemId, {
+                            from: account,
+                            value: price
+                        });
+                        window.location.href = "./my-nft?action=buyed";
+
+                    } catch (error) {
+                        window.location.href = "./my-nft?action=error";
+                    }
+
+                });
 
             });
             
@@ -122,7 +154,7 @@ const createItem = (result) => {
         + `</div>`
         + `<div class="row">`
         + `<div class="col-12">`
-        + `<h2 style="color: rgb(78,115,225);margin-top: 20px">${result.name}</h2>`
+        + `<h2 style="margin-top: 20px">${result.name}</h2>`
         + `</div>`
         + `</div>`
         + `<div class="row">`
@@ -130,36 +162,18 @@ const createItem = (result) => {
         + `<p class="product-description" style="margin-top: 0px;margin-bottom: 10px">${result.description}</p>`
         + `</div>`
         + `</div>`
-        + `<div class="card shadow mb-4" style="margin-top: 12px;">`
-        + `<div class="card-header py-3">`
-        + `<h6 class="m-0 fw-bold" style="color: rgb(78,115,225)">You want to sell this token?</h6>`
-        + `</div>`
         + `<div class="row">`
-        + `<div class="col-6"><button class="btn btn-light" type="button">Buy Now!</button></div>`
+        + `<div class="col-6"><button class="btn btn-light" style="border-radius: 125px;background: rgb(78,115,225);" onclick="buy(${result.itemId}, ${result.price})" type="button">Buy Now!</button></div>`
         + `<div class="col-6">`
-        + `<p class="product-price">$599.00 </p>`
-        + `</div>`
+        + `<p class="product-price">${web3.utils.fromWei(result.price)} ETH</p>`
         + `</div>`
         + `</div>`
         + `</div>`
     return item;
 }
 
-async function buy(tokenId) {
+async function buy(itemId, price) {
 
-    const price = $(`#price${tokenId}`).val();
-    if (price == '') {
-        toastr.error("Price is not valid!");
-    } else {
-        if (!/(([0-9]+)(\.[0-9]+)?)/.test(price)) {
-            toastr.error("Price is not valid!");
-        } else {
-            if (price <= 0) {
-                toastr.error("Price is not valid!");
-            } else {
-                await App.create(tokenId, price);
-            }
-        }
-    }
+    await App.createMarketSale(itemId, price);
 
 }
