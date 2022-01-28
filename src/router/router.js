@@ -15,6 +15,7 @@ router.get('/my-nft', (req, res) => {
     res.render('my-nft', {
         created: (req.query.action && req.query.action == 'created') ? true : false,
         selling: (req.query.action && req.query.action == 'selling') ? true : false,
+        buyed: (req.query.action && req.query.action == 'buyed') ? true : false,
         error: (req.query.action && req.query.action == 'error') ? true : false
     })
 })
